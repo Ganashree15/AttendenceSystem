@@ -29,7 +29,7 @@ import entity.EmployeeEntity;
 @Singleton
 public class EmployeeDaoImpl implements EmployeeDao {
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeDaoImpl.class);
-	private EntityManagerFactory emf = Persistence.createEntityManagerFactory("Attendence");
+	private EntityManagerFactory emf = Persistence.createEntityManagerFactory("demo");
 
 	/**
 	 * Retrieve is used to find the employee entity present in the model and
