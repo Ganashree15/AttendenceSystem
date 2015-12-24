@@ -147,7 +147,7 @@ function CreateController($scope, $location, NewsService) {
 };
 
 
-function LoginController($scope, $rootScope, $location, $cookieStore, UserService,NewsService) {
+function LoginController($scope, $rootScope, $location, $cookieStore, UserService, NewsService) {
 	
 	$scope.rememberMe = false;
 	
@@ -159,10 +159,10 @@ function LoginController($scope, $rootScope, $location, $cookieStore, UserServic
 			if ($scope.rememberMe) {
 				$cookieStore.put('authToken', authToken);
 			}
-			NewsService.get(function(user) {
+			NewsService.get({id: id}, function(user) {
 				$rootScope.user = user;
 				$location.path('/');
-			}, {id: id});
+			});
 		});
 	};
 };
@@ -172,7 +172,7 @@ var services = angular.module('exampleApp.services', ['ngResource']);
 
 services.factory('UserService', function($resource) {
 	
-	return $resource('rest/auth/:action', {action:'@action'},
+	return $resource('rest/auth/:action', {},
 			{
 				authenticate: {
 					method: 'POST',

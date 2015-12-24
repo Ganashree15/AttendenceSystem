@@ -3,7 +3,7 @@
 		title="Create"><span class="fa fa-plus"></span></a>
 </div>
 <div class="page-header">
-	<h3>News</h3>
+	<h3>Employees</h3>
 </div>
 
 <div ng-repeat="newsEntry in newsEntries">
@@ -16,7 +16,7 @@
 			ng-show="hasRole('admin')" title="edit"><span
 			class="fa fa-pencil"></span></a>
 	</div>
-	<h4>{{newsEntry.date | date}}</h4>
-	<p>{{newsEntry.content}}</p>
+	<h4>{{newsEntry.id}}</h4>
+	<p>{{newsEntry.name}}</p>
 </div>
 <hr />
