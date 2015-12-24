@@ -1,6 +1,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 import java.sql.Date;
 
 import javax.persistence.Column;
@@ -9,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * In this example we will use Employee as entity.Id, firstname, lastname,
@@ -70,7 +73,7 @@ public class EmployeeEntity implements Serializable {
 		this.username = username;
 		this.createddate = createddate;
 		this.email = email;
-		this.password = password;
+		this.password = hashPassword(password);
 		this.gender = gender;
 
 	}
@@ -144,7 +147,21 @@ public class EmployeeEntity implements Serializable {
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
+		this.password = hashPassword(password);
+	}
+
+	private String hashPassword(String password) {
+		// private String digestAlgorithm="SHA-1";
+		// private String charset="UTF-8";
+		try {
+
+			MessageDigest digest = MessageDigest.getInstance("SHA1");
+			digest.update(password.getBytes("UTF-8"));
+			byte[] rawHash = digest.digest();
+			return new String(Hex.encodeHex(rawHash));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public String getGender() {
