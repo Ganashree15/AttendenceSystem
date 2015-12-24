@@ -2,28 +2,32 @@ package service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import api.data.Employee;
-import entity.EmployeeEntity;
-import persistence.EmployeeDao;
+import transfer.EmployeeTransfer;
+import dao.EmployeeDao;
+import entity.Employee;
 
 /**
  * One implementation of the interface for Employee Service
  * 
  */
-@Singleton
 public class EmployeeServiceImpl implements EmployeeService {
 
-	@Inject
 	private EmployeeDao employeeDao;
 
+	public EmployeeServiceImpl(EmployeeDao employeeDao) {
+		this.employeeDao = employeeDao;
+	}
+
 	@Override
-	public Employee retrieve(long id) {
-		return entityToEmployee(employeeDao.retrieve(id));
+	public EmployeeTransfer retrieve(long id) {
+		return toEmployeeTransfer(employeeDao.find(id));
 	}
 
 	@Override
@@ -32,63 +36,43 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public void save(Employee employee) {
-		employeeDao.save(employeeToEntity(employee));
+	public EmployeeTransfer save(Employee employee) {
+		return toEmployeeTransfer(employeeDao.save(employee));
 	}
 
 	@Override
-	public void update(long id, Employee employee) {
-		employeeDao.delete(id);
+	public EmployeeTransfer update(long id, Employee employee) {
+		return toEmployeeTransfer(employeeDao.save(employee));
 	}
 
 	@Override
-	public Collection<Employee> findAll() {
-		List<Employee> employees = new ArrayList<Employee>();
-		for (EmployeeEntity entity : employeeDao.findAll()) {
-			employees.add(entityToEmployee(entity));
+	public Collection<EmployeeTransfer> findAll() {
+		List<EmployeeTransfer> rets = new ArrayList<EmployeeTransfer>();
+
+		for (Employee employee : employeeDao.findAll()) {
+			rets.add(toEmployeeTransfer(employee));
 		}
-		return employees;
+		return rets;
 	}
 
-	// =========== Helpers ================
-
-	/**
-	 * mapping from the entity to employee present in jersey
-	 * 
-	 */
-	private Employee entityToEmployee(EmployeeEntity entity) {
-		Employee employee = new Employee();
-
-		employee.setId(entity.getId());
-		employee.setFirstName(entity.getFirstName());
-		employee.setLastName(entity.getLastName());
-		employee.setDateofbirth(entity.getDateofbirth());
-		employee.setCreateddate(entity.getCreateddate());
-		employee.setEmail(entity.getEmail());
-		employee.setJobtitle(entity.getJobtitle());
-		employee.setUsername(entity.getUsername());
-		employee.setPassword(entity.getPassword());
-		employee.setGender(entity.getGender());
-		return employee;
+	private EmployeeTransfer toEmployeeTransfer(Employee employee) {
+		EmployeeTransfer ret = new EmployeeTransfer();
+		ret.setId(employee.getId());
+		ret.setName(employee.getUsername());
+		ret.setRoles(this.createRoleMap(employee));
+		return ret;
 	}
 
-	/**
-	 * mapping from employee to entity in hibernate jpa
-	 * 
-	 */
-	private EmployeeEntity employeeToEntity(Employee employee) {
-		EmployeeEntity entity = new EmployeeEntity();
+	private Map<String, Boolean> createRoleMap(UserDetails userDetails) {
+		Map<String, Boolean> roles = new HashMap<String, Boolean>();
+		for (GrantedAuthority authority : userDetails.getAuthorities()) {
+			roles.put(authority.getAuthority(), Boolean.TRUE);
+		}
+		return roles;
+	}
 
-		entity.setId(employee.getId());
-		entity.setFirstName(employee.getFirstName());
-		entity.setLastName(employee.getLastName());
-		entity.setDateofbirth(employee.getDateofbirth());
-		entity.setCreateddate(employee.getCreateddate());
-		entity.setEmail(employee.getEmail());
-		entity.setJobtitle(employee.getJobtitle());
-		entity.setUsername(employee.getUsername());
-		entity.setPassword(employee.getPassword());
-		entity.setGender(employee.getGender());
-		return entity;
+	@Override
+	public EmployeeTransfer findByUsername(String username) {
+		return toEmployeeTransfer(employeeDao.findByName(username));
 	}
 }

@@ -2,7 +2,8 @@ package service;
 
 import java.util.Collection;
 
-import api.data.Employee;
+import transfer.EmployeeTransfer;
+import entity.Employee;
 
 /**
  * An interface that defines what a Employee Services looks like in general
@@ -10,14 +11,16 @@ import api.data.Employee;
  */
 public interface EmployeeService {
 
-	public Employee retrieve(long id);
+	public EmployeeTransfer retrieve(long id);
+
+	public EmployeeTransfer findByUsername(String username);
 
 	public void delete(long id);
 
-	public void save(Employee employee);
+	public EmployeeTransfer save(Employee employee);
 
-	public Collection<Employee> findAll();
+	public Collection<EmployeeTransfer> findAll();
 
-	public void update(long id, Employee employee);
+	public EmployeeTransfer update(long id, Employee employee);
 
 }
